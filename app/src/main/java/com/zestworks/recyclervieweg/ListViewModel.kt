@@ -9,11 +9,11 @@ class ListViewModel : ViewModel() {
     val listLiveData = MutableLiveData<List<String>>().apply { postValue(list) }
 
     fun onItemClicked(position:Int){
-        if (position>0) {
+
             val s = list[position]
             list.removeAt(position)
             list.add(0, s)
             listLiveData.postValue(list)
-        }
+
      }
 }
