@@ -1,10 +1,10 @@
 package com.zestworks.recyclervieweg
 
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 
 
@@ -20,31 +20,50 @@ class RecyclerAdapter(
         return items.size
     }
 
-    override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ItemViewHolder , position: Int) {
         holder.editText.setText(items[position])
     }
 
     fun setList(list:List<String>){
+        val diffCallback = ListDiffUtil(items, list)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
         items = list
+        diffResult.dispatchUpdatesTo(this)
     }
 
-    inner class ItemViewHolder(view: View):RecyclerView.ViewHolder(view), View.OnClickListener, View.OnTouchListener{
-        override fun onTouch(v: View?, event: MotionEvent?): Boolean
+    inner class ItemViewHolder(view: View):RecyclerView.ViewHolder(view), View.OnClickListener{
+        override fun onClick(v: View?)
         {
-            if(event!!.action == MotionEvent.ACTION_UP)
-             onItemClickListener.onItemClicked(adapterPosition)
-            return false
+             onItemClickListener.onItemClicked(this.adapterPosition)
         }
 
-        val editText=view.findViewById<EditText>(R.id.edittext)
+        val editText: EditText =view.findViewById (R.id.edittext)
         init {
             editText.setOnClickListener(this)
-            editText.setOnTouchListener(this)
-        }
-        override fun onClick(v: View?) {
-            onItemClickListener.onItemClicked(adapterPosition)
         }
 
+    }
+}
+
+
+class ListDiffUtil(private val oldList:List<String>, private val newList:List<String>):DiffUtil.Callback(){
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return oldList.containsAll(newList)
+    }
+
+    override fun getOldListSize(): Int {
+        return oldList.size
+    }
+
+    override fun getNewListSize(): Int {
+        return newList.size
+    }
+
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        val  name = oldList[oldItemPosition]
+        val name1 = newList[newItemPosition]
+
+        return name == name1
     }
 }
 
