@@ -31,7 +31,8 @@ class RecyclerAdapter(
     inner class ItemViewHolder(view: View):RecyclerView.ViewHolder(view), View.OnClickListener, View.OnTouchListener{
         override fun onTouch(v: View?, event: MotionEvent?): Boolean
         {
-            onItemClickListener.onItemClicked(adapterPosition)
+            if(event!!.action == MotionEvent.ACTION_UP)
+             onItemClickListener.onItemClicked(adapterPosition)
             return false
         }
 
