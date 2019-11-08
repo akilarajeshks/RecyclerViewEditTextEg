@@ -11,42 +11,46 @@ import androidx.recyclerview.widget.RecyclerView
 class RecyclerAdapter(
     private var items: List<String>,
     val onItemClickListener: RecyclerViewClickListener
-):RecyclerView.Adapter<RecyclerAdapter.ItemViewHolder>() {
+) : RecyclerView.Adapter<RecyclerAdapter.ItemViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
-        return ItemViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item,parent,false))
+        return ItemViewHolder(
+            LayoutInflater.from(parent.context).inflate(
+                R.layout.list_item,
+                parent,
+                false
+            )
+        )
     }
 
     override fun getItemCount(): Int {
         return items.size
     }
 
-    override fun onBindViewHolder(holder: ItemViewHolder , position: Int) {
+    override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         holder.editText.setText(items[position])
     }
 
-    fun setList(list:List<String>){
+    fun setList(list: List<String>) {
         val diffCallback = ListDiffUtil(items, list)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         items = list
         diffResult.dispatchUpdatesTo(this)
     }
 
-    inner class ItemViewHolder(view: View):RecyclerView.ViewHolder(view), View.OnClickListener{
-        override fun onClick(v: View?)
-        {
-             onItemClickListener.onItemClicked(this.adapterPosition)
-        }
+    inner class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val editText: EditText = view.findViewById(R.id.edittext)
 
-        val editText: EditText =view.findViewById (R.id.edittext)
         init {
-            editText.setOnClickListener(this)
+            editText.setOnFocusChangeListener { v, isFocused ->
+                onItemClickListener.onItemClicked(adapterPosition)
+            }
         }
-
     }
 }
 
 
-class ListDiffUtil(private val oldList:List<String>, private val newList:List<String>):DiffUtil.Callback(){
+class ListDiffUtil(private val oldList: List<String>, private val newList: List<String>) :
+    DiffUtil.Callback() {
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         return oldList.containsAll(newList)
     }
@@ -60,7 +64,7 @@ class ListDiffUtil(private val oldList:List<String>, private val newList:List<St
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        val  name = oldList[oldItemPosition]
+        val name = oldList[oldItemPosition]
         val name1 = newList[newItemPosition]
 
         return name == name1
